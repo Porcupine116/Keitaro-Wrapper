@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f5f7f8">
+  <title>Adrobot · Keitaro Wrapper</title>
+  <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <a class="brand" href="#creator" aria-label="Adrobot Keitaro Wrapper">
+        <span class="brand-mark">A</span>
+        <span><strong>ADROBOT</strong><small>KEITARO TOOLS</small></span>
+      </a>
+      <div class="nav-caption">РАБОЧЕЕ ПРОСТРАНСТВО</div>
+      <button class="nav-item active" data-view="creator"><span class="nav-icon">＋</span><span>Создать кампанию</span></button>
+      <button class="nav-item" data-view="editor"><span class="nav-icon">▤</span><span>Редактор потоков</span></button>
+      <div class="sidebar-bottom">
+        <div class="sidebar-note"><span class="note-dot"></span><span>Подключение к трекеру</span><b id="sidebar-status">Проверка…</b></div>
+        <small>Внутренний инструмент Adrobot</small>
+      </div>
+    </aside>
+
+    <main class="main-area">
+      <header class="topbar">
+        <div>
+          <div class="breadcrumb">ADROBOT <span>/</span> KEITARO</div>
+          <h1 id="page-title">Создание кампании</h1>
+        </div>
+        <div class="topbar-right">
+          <div class="connection"><span class="status-dot" id="connection-dot"></span><span id="connection-text">Проверяем подключение…</span></div>
+          <span class="version-tag">WRAPPER · 0.2</span>
+        </div>
+      </header>
+
+      <section id="creator-view" class="view">
+        <div class="page-intro">
+          <div><h2>Новая кампания</h2><p>Заполни параметры — приложение создаст кампанию и два потока в Keitaro.</p></div>
+          <span class="section-index">01 <i>/</i> CREATE</span>
+        </div>
+
+        <form id="creator-form" class="surface creator-form">
+          <div class="form-section-title"><span class="section-symbol">01</span><div><b>Параметры кампании</b><small>Основная информация и настройки трекера</small></div></div>
+          <div class="form-grid">
+            <label class="field span-2"><span>Название кампании <em>*</em></span><input name="name" placeholder="Например, AU — Nutra — November" required minlength="2" maxlength="180"></label>
+            <label class="field"><span>Гео · код страны <em>*</em></span><input name="country_code" placeholder="AU" required minlength="2" maxlength="2" pattern="[A-Za-z]{2}" autocomplete="off"><small>ISO 3166-1 alpha-2: AU, DE, US, PL и т. д.</small></label>
+            <label class="field"><span>Оффер Keitaro <em>*</em></span><select name="offer_id" id="offer-select" required><option value="">Загрузка офферов…</option></select></label>
+            <label class="field"><span>Домен кампании <em>*</em></span><select name="domain_id" id="domain-select" required><option value="">Загрузка доменов…</option></select></label>
+            <label class="field"><span>Группа кампаний <em>*</em></span><select name="group_id" id="group-select" required><option value="">Загрузка групп…</option></select></label>
+            <label class="field span-2"><span>Источник трафика <em>*</em></span><select name="traffic_source_id" id="source-select" required><option value="">Загрузка источников…</option></select></label>
+          </div>
+
+          <div class="form-section-title flow-title"><span class="section-symbol">02</span><div><b>Маршрутизация трафика</b><small>Потоки будут настроены автоматически</small></div></div>
+          <div class="flow-preview-grid">
+            <article class="flow-preview-card">
+              <div class="preview-card-top"><span class="flow-number">FLOW 1</span><span class="flow-kind">REGULAR</span></div>
+              <h3>Страна совпала</h3>
+              <div class="route-line"><span class="route-dot"></span><span>Гео-фильтр: указанная страна</span></div>
+              <div class="route-destination"><span class="destination-icon">↗</span><div><small>РЕДИРЕКТ</small><b>https://www.google.com</b></div></div>
+            </article>
+            <article class="flow-preview-card">
+              <div class="preview-card-top"><span class="flow-number">FLOW 2</span><span class="flow-kind default-kind">DEFAULT</span></div>
+              <h3>Все остальные посетители</h3>
+              <div class="route-line"><span class="route-dot muted-dot"></span><span>Срабатывает, если Flow 1 не подошёл</span></div>
+              <div class="route-destination"><span class="destination-icon green-icon">◎</span><div><small>ОФФЕР</small><b>Выбранный оффер · 100%</b></div></div>
+            </article>
+          </div>
+          <div class="form-footer">
+            <p><span class="info-mark">i</span> Кампания создаётся в несколько запросов. При частичной ошибке ID созданных сущностей будет показан в ответе.</p>
+            <button class="primary-button" type="submit" id="create-button">Создать кампанию <span>→</span></button>
+          </div>
+        </form>
+        <div id="creator-result" class="result-panel hidden" aria-live="polite"></div>
+      </section>
+
+      <section id="editor-view" class="view hidden">
+        <div class="page-intro">
+          <div><h2>Редактор потоков</h2><p>Выбери существующую кампанию: увидишь потоки и офферы внутри каждого из них.</p></div>
+          <span class="section-index">02 <i>/</i> EDIT</span>
+        </div>
+        <div class="surface editor-toolbar">
+          <label class="field campaign-field"><span>Кампания Keitaro</span><select id="campaign-select"><option value="">Выбери кампанию…</option></select></label>
+          <div class="toolbar-actions"><button class="outline-button" id="refresh-campaigns" type="button">↻ Обновить список</button><a class="outline-button disabled-link" id="open-in-keitaro" href="#" target="_blank" rel="noopener">Открыть в Keitaro ↗</a></div>
+        </div>
+        <div id="campaign-summary" class="campaign-summary hidden"></div>
+        <div id="editor-content" class="streams-list">
+          <div class="surface empty-state"><div class="empty-symbol">⇄</div><b>Кампания не выбрана</b><span>Выбери кампанию выше, чтобы загрузить её потоки.</span></div>
+        </div>
+      </section>
+
+      <div id="toast" class="toast hidden" role="status"></div>
+      <footer><span>ADROBOT</span> · Keitaro Wrapper <i>—</i> FastAPI + SQLAlchemy</footer>
+    </main>
+  </div>
+  <script src="/static/app.js"></script>
+</body>
+</html>
